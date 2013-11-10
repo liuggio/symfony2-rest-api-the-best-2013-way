@@ -1,0 +1,5 @@
+acme_blog_page:
+    type: rest
+    prefix: /v1
+    resource: Acme\BlogBundle\Controller\PageController
+    name_prefix:  api_1_ # naming collision
