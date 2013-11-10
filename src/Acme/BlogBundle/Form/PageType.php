@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PageType extends AbstractType
 {
-        /**
+    /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
@@ -26,7 +26,8 @@ class PageType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Acme\BlogBundle\Entity\Page'
+            'data_class' => 'Acme\BlogBundle\Entity\Page',
+            'csrf_protection'   => false
         ));
     }
 
@@ -35,6 +36,6 @@ class PageType extends AbstractType
      */
     public function getName()
     {
-        return 'acme_blogbundle_page';
+        return '';
     }
 }

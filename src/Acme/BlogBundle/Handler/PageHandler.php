@@ -29,4 +29,10 @@ class PageHandler implements PageHandlerInterface
     {
         return $this->repository->find($id);
     }
+
+    private function createPage()
+    {
+         return new $this->entityClass();
+    }
+
 }

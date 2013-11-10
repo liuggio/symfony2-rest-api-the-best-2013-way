@@ -26,6 +26,7 @@ class PageHandlerTest extends \PHPUnit_Framework_TestCase
         $class = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
 
         $this->om->expects($this->any())
             ->method('getRepository')
@@ -39,9 +40,8 @@ class PageHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue(static::PAGE_CLASS));
 
-        $this->pageHandler = $this->createPageHandler($this->om, static::PAGE_CLASS);
-    }
 
+    }
 
     public function testGet()
     {
@@ -51,12 +51,14 @@ class PageHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo($id))
             ->will($this->returnValue($page));
 
+        $this->pageHandler = $this->createPageHandler($this->om, static::PAGE_CLASS,  $this->formFactory);
+
         $this->pageHandler->get($id);
     }
 
-    protected function createPageHandler($objectManager, $pageClass)
+    protected function createPageHandler($objectManager, $pageClass, $formFactory)
     {
-        return new PageHandler($objectManager, $pageClass);
+        return new PageHandler($objectManager, $pageClass, $formFactory);
     }
 
     protected function getPage()

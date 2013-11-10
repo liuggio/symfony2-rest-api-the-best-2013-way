@@ -3,19 +3,23 @@
 namespace Acme\BlogBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations;
-use FOS\RestBundle\Request\ParamFetcherInterface;
+
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
+use Acme\BlogBundle\Exception\InvalidFormException;
+use Acme\BlogBundle\Form\PageType;
 use Acme\BlogBundle\Model\PageInterface;
 
 
 class PageController extends FOSRestController
 {
     /**
-     * Get single page,
+     * Get single Page,
      *
      * @ApiDoc(
      *   resource = true,
@@ -29,7 +33,6 @@ class PageController extends FOSRestController
      *
      * @Annotations\View(templateVar="page")
      *
-     * @param Request $request the request object
      * @param int     $id      the page id
      *
      * @return array
@@ -44,7 +47,26 @@ class PageController extends FOSRestController
     }
 
     /**
-     * Fetch the Cart.
+     * Presents the form to use to create a new page.
+     *
+     * @ApiDoc(
+     *   resource = true,
+     *   statusCodes = {
+     *     200 = "Returned when successful"
+     *   }
+     * )
+     *
+     * @Annotations\View()
+     *
+     * @return FormTypeInterface
+     */
+    public function newPageAction()
+    {
+        return $this->createForm(new PageType());
+    }
+
+    /**
+     * Fetch a Page or throw an 404 Exception.
      *
      * @param mixed $id
      *

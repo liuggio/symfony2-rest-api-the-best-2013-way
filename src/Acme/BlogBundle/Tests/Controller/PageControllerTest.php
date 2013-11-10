@@ -13,7 +13,7 @@ class PageControllerTest extends WebTestCase
         $this->loadFixtures($fixtures);
     }
 
-    public function testIndex()
+    public function testJsonGetPageAction()
     {
         $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
         $this->customSetUp($fixtures);
@@ -22,7 +22,7 @@ class PageControllerTest extends WebTestCase
 
         $route =  $this->getUrl('api_1_get_page', array('id' => $page->getId(), '_format' => 'json'));
 
-        $this->client->request('GET', $route);
+        $this->client->request('GET', $route, array('ACCEPT' => 'application/json'));
         $response = $this->client->getResponse();
         $this->assertJsonResponse($response, 200);
         $content = $response->getContent();
@@ -50,6 +50,4 @@ class PageControllerTest extends WebTestCase
             );
         }
     }
-
-
 }
