@@ -107,6 +107,51 @@ class PageController extends FOSRestController
     }
 
     /**
+     * Update existing page from the submitted data or create a new page at a specific location.
+     *
+     * @ApiDoc(
+     *   resource = true,
+     *   input = "Acme\DemoBundle\Form\PageType",
+     *   statusCodes = {
+     *     204 = "Returned when successful",
+     *     400 = "Returned when the form has errors"
+     *   }
+     * )
+     *
+     * @Annotations\View(
+     *  template = "AcmeBlogBundle:Page:editPage.html.twig"
+     * )
+     *
+     * @param int     $id      the page id
+     *
+     * @return FormTypeInterface|RouteRedirectView
+     *
+     * @throws NotFoundHttpException when page not exist
+     */
+    public function putPageAction($id)
+    {
+        try {
+
+            $page = $this->container->get('acme_blog.page.handler')->put(
+                $this->getOr404($id),
+                $this->container->get('request')->request->all()
+            );
+
+            $routeOptions = array(
+                'id' => $page->getId(),
+                '_format' => $this->container->get('request')->get('_format')
+            );
+
+            return $this->routeRedirectView('api_1_get_page', $routeOptions, Codes::HTTP_NO_CONTENT);
+
+        } catch (InvalidFormException $exception) {
+
+            return array('form' => $exception->getForm());
+        }
+    }
+
+
+    /**
      * Fetch a Page or throw an 404 Exception.
      *
      * @param mixed $id
