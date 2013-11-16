@@ -1,0 +1,11 @@
+# src/Acme/BlogBundle/Resources/config/validation.yml
+Acme\BlogBundle\Entity\Page:
+    properties:
+        title:
+            - NotBlank: ~
+            - NotNull: ~
+            - Length:
+                min: 2
+                max: 50
+                minMessage: "Your title must be at least {{ limit }} characters length"
+                maxMessage: "Your title name cannot be longer than {{ limit }} characters length"

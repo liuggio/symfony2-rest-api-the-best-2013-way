@@ -15,7 +15,7 @@ http://getcomposer.org/ or just run the following command:
 
 Then, use the `create-project` command to generate a new Symfony application:
 
-    php composer.phar create-project liuggio/rest-api-the-best-way-2013 blog-rest-symfony2
+    php composer.phar create-project liuggio/symfony2-rest-api-the-best-2013-way -sdev
     cd blog-rest-symfony2
 
 Composer will install Symfony and all its dependencies under the
@@ -24,9 +24,11 @@ Composer will install Symfony and all its dependencies under the
 ### Run the test.
 
 This repo is a demo/tutorial,
-start with the first article running:
 
 `git checkout -f part1`
+`phpunit -c app`
+
+`git checkout -f part2`
 `phpunit -c app`
 
 

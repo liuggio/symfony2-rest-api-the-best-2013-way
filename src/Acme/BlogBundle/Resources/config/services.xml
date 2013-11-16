@@ -14,6 +14,7 @@
         <service id="acme_blog.page.handler" class="%acme_blog.page.handler.class%">
             <argument type="service" id="doctrine.orm.entity_manager" />
             <argument>%acme_blog.page.class%</argument>
+            <argument type="service" id="form.factory"></argument>
         </service>
     </services>
 

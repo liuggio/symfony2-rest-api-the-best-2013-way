@@ -2,3 +2,7 @@ acme_blogs:
     type: rest
     prefix: /api
     resource: "@AcmeBlogBundle/Resources/config/routes.yml"
+
+NelmioApiDocBundle:
+    resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+    prefix:   /api/doc

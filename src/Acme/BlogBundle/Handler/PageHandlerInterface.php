@@ -16,4 +16,14 @@ interface PageHandlerInterface
      * @return PageInterface
      */
     public function get($id);
+
+
+    /**
+     * Post Page, creates a new Page.
+     *
+     * @param array $parameters
+     *
+     * @return PageInterface
+     */
+    public function post(array $parameters);
 }

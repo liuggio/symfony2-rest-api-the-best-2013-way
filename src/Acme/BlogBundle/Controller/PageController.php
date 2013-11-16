@@ -65,6 +65,47 @@ class PageController extends FOSRestController
         return $this->createForm(new PageType());
     }
 
+
+    /**
+     * Create a Page from the submitted data.
+     *
+     * @ApiDoc(
+     *   resource = true,
+     *   description = "Creates a new page from the submitted data.",
+     *   input = "Acme\BlogBundle\Form\PageType",
+     *   statusCodes = {
+     *     200 = "Returned when successful",
+     *     400 = "Returned when the form has errors"
+     *   }
+     * )
+     *
+     * @Annotations\View(
+     *  template = "AcmeBlogBundle:Page:newPage.html.twig",
+     *  statusCode = Codes::HTTP_BAD_REQUEST
+     * )
+     *
+     * @return FormTypeInterface|RouteRedirectView
+     */
+    public function postPageAction()
+    {
+        try {
+            $newPage = $this->container->get('acme_blog.page.handler')->post(
+                    $this->container->get('request')->request->all()
+            );
+
+            $routeOptions = array(
+                'id' => $newPage->getId(),
+                '_format' => $this->container->get('request')->get('_format')
+            );
+
+            return $this->routeRedirectView('api_1_get_page', $routeOptions, Codes::HTTP_CREATED);
+
+        } catch (InvalidFormException $exception) {
+
+            return array('form' => $exception->getForm());
+        }
+    }
+
     /**
      * Fetch a Page or throw an 404 Exception.
      *

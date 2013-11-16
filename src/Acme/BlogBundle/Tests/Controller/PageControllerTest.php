@@ -32,6 +32,38 @@ class PageControllerTest extends WebTestCase
 
     }
 
+
+    public function testJsonPostPageAction()
+    {
+        $this->client = static::createClient();
+        $this->client->request(
+            'POST',
+            '/api/v1/pages.json',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"title":"title1","body":"body1"}'
+        );
+
+        $this->assertJsonResponse($this->client->getResponse(), 201, false);
+    }
+
+    public function testJsonPostPageActionShouldReturn400WithBadParameters()
+    {
+        $this->client = static::createClient();
+        $this->client->request(
+            'POST',
+            '/api/v1/pages.json',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"titles":"title1","bodys":"body1"}'
+        );
+
+        $this->assertJsonResponse($this->client->getResponse(), 400, false);
+    }
+
+
     protected function assertJsonResponse($response, $statusCode = 200, $checkValidJson =  true, $contentType = 'application/json')
     {
         $this->assertEquals(
