@@ -39,8 +39,6 @@ class PageHandlerTest extends \PHPUnit_Framework_TestCase
         $class->expects($this->any())
             ->method('getName')
             ->will($this->returnValue(static::PAGE_CLASS));
-
-
     }
 
 
@@ -118,6 +116,71 @@ class PageHandlerTest extends \PHPUnit_Framework_TestCase
         $this->pageHandler = $this->createPageHandler($this->om, static::PAGE_CLASS,  $this->formFactory);
         $this->pageHandler->post($parameters);
     }
+
+    public function testPut()
+    {
+        $title = 'title1';
+        $body = 'body1';
+
+        $parameters = array('title' => $title, 'body' => $body);
+
+        $page = $this->getPage();
+        $page->setTitle($title);
+        $page->setBody($body);
+
+        $form = $this->getMock('Acme\BlogBundle\Tests\FormInterface'); //'Symfony\Component\Form\FormInterface' bugs on iterator
+        $form->expects($this->once())
+            ->method('submit')
+            ->with($this->anything());
+        $form->expects($this->once())
+            ->method('isValid')
+            ->will($this->returnValue(true));
+        $form->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($page));
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->will($this->returnValue($form));
+
+        $this->pageHandler = $this->createPageHandler($this->om, static::PAGE_CLASS,  $this->formFactory);
+        $pageObject = $this->pageHandler->put($page, $parameters);
+
+        $this->assertEquals($pageObject, $page);
+    }
+
+    public function testPatch()
+    {
+        $title = 'title1';
+        $body = 'body1';
+
+        $parameters = array('body' => $body);
+
+        $page = $this->getPage();
+        $page->setTitle($title);
+        $page->setBody($body);
+
+        $form = $this->getMock('Acme\BlogBundle\Tests\FormInterface'); //'Symfony\Component\Form\FormInterface' bugs on iterator
+        $form->expects($this->once())
+            ->method('submit')
+            ->with($this->anything());
+        $form->expects($this->once())
+            ->method('isValid')
+            ->will($this->returnValue(true));
+        $form->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($page));
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->will($this->returnValue($form));
+
+        $this->pageHandler = $this->createPageHandler($this->om, static::PAGE_CLASS,  $this->formFactory);
+        $pageObject = $this->pageHandler->patch($page, $parameters);
+
+        $this->assertEquals($pageObject, $page);
+    }
+
 
     protected function createPageHandler($objectManager, $pageClass, $formFactory)
     {

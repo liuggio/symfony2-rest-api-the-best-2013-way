@@ -32,7 +32,6 @@ class PageControllerTest extends WebTestCase
 
     }
 
-
     public function testJsonPostPageAction()
     {
         $this->client = static::createClient();
