@@ -29,60 +29,36 @@ class PageControllerTest extends WebTestCase
 
         $decoded = json_decode($content, true);
         $this->assertTrue(isset($decoded['id']));
-
     }
 
-    public function testJsonPutPageAction()
+    public function testHeadRoute()
     {
         $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
         $this->customSetUp($fixtures);
         $pages = LoadPageData::$pages;
         $page = array_pop($pages);
 
-        $this->client = static::createClient();
-        $this->client->request(
-            'PUT',
-            sprintf('/api/v1/pages/%d.json', $page->getId()),
-            array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            '{"title":"abc","body":"def"}'
-        );
-
-        $page->setTitle('abc');
-        $page->setBody('def');
-
-        $this->assertJsonResponse($this->client->getResponse(), 204, false);
-
-        $updatedPage = $this->getContainer()->get('acme_blog.page.handler')->get($page->getId());
-        $this->assertEquals($updatedPage, $page);
+        $this->client->request('HEAD',  sprintf('/api/v1/pages/%d.json', $page->getId()), array('ACCEPT' => 'application/json'));
+        $response = $this->client->getResponse();
+        $this->assertJsonResponse($response, 200, false);
     }
 
-    public function testJsonPatchPageAction()
+    public function testJsonNewPageAction()
     {
-        $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
-        $this->customSetUp($fixtures);
-        $pages = LoadPageData::$pages;
-        $page = array_pop($pages);
-
         $this->client = static::createClient();
         $this->client->request(
-            'PATCH',
-            sprintf('/api/v1/pages/%d.json', $page->getId()),
+            'GET',
+            '/api/v1/pages/new.json',
             array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            '{"body":"def"}'
+            array()
         );
 
-        $page->setBody('def');
-
-        $this->assertJsonResponse($this->client->getResponse(), 204, false);
-
-        $updatedPage = $this->getContainer()->get('acme_blog.page.handler')->get($page->getId());
-        $this->assertEquals($updatedPage, $page);
+        $this->assertJsonResponse($this->client->getResponse(), 200, true);
+        $this->assertEquals(
+            '{"children":{"title":[],"body":[]}}',
+            $this->client->getResponse()->getContent(),
+            $this->client->getResponse()->getContent());
     }
-
 
     public function testJsonPostPageAction()
     {
@@ -113,6 +89,84 @@ class PageControllerTest extends WebTestCase
 
         $this->assertJsonResponse($this->client->getResponse(), 400, false);
     }
+
+    public function testJsonPutPageActionShouldModify()
+    {
+        $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
+        $this->customSetUp($fixtures);
+        $pages = LoadPageData::$pages;
+        $page = array_pop($pages);
+
+        $this->client = static::createClient();
+        $this->client->request(
+            'PUT',
+            sprintf('/api/v1/pages/%d.json', $page->getId()),
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"title":"abc","body":"def"}'
+        );
+
+        $this->assertJsonResponse($this->client->getResponse(), 204, false);
+        $this->assertTrue(
+            $this->client->getResponse()->headers->contains(
+                'Location',
+                sprintf('http://localhost/api/v1/pages/%d.json', $page->getId())
+            ),
+            $this->client->getResponse()->headers
+        );
+    }
+
+    public function testJsonPutPageActionShouldCreate()
+    {
+        $this->client = static::createClient();
+        $id = 0;
+
+        $this->client->request('GET', sprintf('/api/v1/pages/%d.json', $id), array('ACCEPT' => 'application/json'));
+
+        $this->assertEquals(404, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+
+        $this->client->request(
+            'PUT',
+            sprintf('/api/v1/pages/%d.json', $id),
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"title":"abc","body":"def"}'
+        );
+
+        $this->assertJsonResponse($this->client->getResponse(), 201, false);
+    }
+
+    public function testJsonPatchPageAction()
+    {
+        $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
+        $this->customSetUp($fixtures);
+        $pages = LoadPageData::$pages;
+        $page = array_pop($pages);
+
+        $this->client = static::createClient();
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/v1/pages/%d.json', $page->getId()),
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"body":"def"}'
+        );
+
+        $this->assertJsonResponse($this->client->getResponse(), 204, false);
+        $this->assertTrue(
+            $this->client->getResponse()->headers->contains(
+                'Location',
+                sprintf('http://localhost/api/v1/pages/%d.json', $page->getId())
+            ),
+            $this->client->getResponse()->headers
+        );
+    }
+
+
+
 
 
     protected function assertJsonResponse($response, $statusCode = 200, $checkValidJson =  true, $contentType = 'application/json')

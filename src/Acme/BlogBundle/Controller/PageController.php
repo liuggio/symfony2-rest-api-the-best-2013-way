@@ -9,8 +9,9 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations;
 use FOS\RestBundle\View\View;
-use Symfony\Component\Form\FormTypeInterface;
+use FOS\RestBundle\Request\ParamFetcherInterface;
 
+use Symfony\Component\Form\FormTypeInterface;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Acme\BlogBundle\Exception\InvalidFormException;
@@ -21,7 +22,41 @@ use Acme\BlogBundle\Model\PageInterface;
 class PageController extends FOSRestController
 {
     /**
-     * Get single Page,
+     * List all pages.
+     *
+     * @ApiDoc(
+     *   resource = true,
+     *   statusCodes = {
+     *     200 = "Returned when successful"
+     *   }
+     * )
+     *
+     * @Annotations\QueryParam(name="offset", requirements="\d+", nullable=true, description="Offset from which to start listing pages.")
+     * @Annotations\QueryParam(name="limit", requirements="\d+", default="5", description="How many pages to return.")
+     *
+     * @Annotations\View()
+     *
+     * @param Request               $request      the request object
+     * @param ParamFetcherInterface $paramFetcher param fetcher service
+     *
+     * @return array
+     */
+    public function getPagesAction(Request $request, ParamFetcherInterface $paramFetcher)
+    {
+        $session = $request->getSession();
+
+        $offset = $paramFetcher->get('offset');
+        $start = null == $offset ? 0 : $offset + 1;
+        $limit = $paramFetcher->get('limit');
+
+        $pages = $session->get(self::SESSION_CONTEXT_PAGE, array());
+        $pages = array_slice($notes, $start, $limit, true);
+
+        return new NoteCollection($notes, $offset, $limit);
+    }
+
+    /**
+     * Get single Page.
      *
      * @ApiDoc(
      *   resource = true,
@@ -58,7 +93,9 @@ class PageController extends FOSRestController
      *   }
      * )
      *
-     * @Annotations\View()
+     * @Annotations\View(
+     *  templateVar = "form"
+     * )
      *
      * @return FormTypeInterface
      */
@@ -66,7 +103,6 @@ class PageController extends FOSRestController
     {
         return $this->createForm(new PageType());
     }
-
 
     /**
      * Create a Page from the submitted data.
@@ -118,6 +154,7 @@ class PageController extends FOSRestController
      *   resource = true,
      *   input = "Acme\DemoBundle\Form\PageType",
      *   statusCodes = {
+     *     201 = "Returned when the Page is created",
      *     204 = "Returned when successful",
      *     400 = "Returned when the form has errors"
      *   }
@@ -138,18 +175,25 @@ class PageController extends FOSRestController
     public function putPageAction(Request $request, $id)
     {
         try {
-
-            $page = $this->container->get('acme_blog.page.handler')->put(
-                $this->getOr404($id),
-                $request->request->all()
-            );
+            if (!($page = $this->container->get('acme_blog.page.handler')->get($id))) {
+                $statusCode = Codes::HTTP_CREATED;
+                $page = $this->container->get('acme_blog.page.handler')->post(
+                    $request->request->all()
+                );
+            } else {
+                $statusCode = Codes::HTTP_NO_CONTENT;
+                $page = $this->container->get('acme_blog.page.handler')->put(
+                    $page,
+                    $request->request->all()
+                );
+            }
 
             $routeOptions = array(
                 'id' => $page->getId(),
                 '_format' => $request->get('_format')
             );
 
-            return $this->routeRedirectView('api_1_get_page', $routeOptions, Codes::HTTP_NO_CONTENT);
+            return $this->routeRedirectView('api_1_get_page', $routeOptions, $statusCode);
 
         } catch (InvalidFormException $exception) {
 

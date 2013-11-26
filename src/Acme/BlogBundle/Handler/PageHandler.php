@@ -36,6 +36,18 @@ class PageHandler implements PageHandlerInterface
     }
 
     /**
+     * Get a Page.
+     *
+     * @param mixed $id
+     *
+     * @return PageInterface
+     */
+    public function all(int $offset = 0, int $limit = 5)
+    {
+        return $this->repository->find($id);
+    }
+
+    /**
      * Create a new Page.
      *
      * @param array $parameters
