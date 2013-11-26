@@ -58,6 +58,32 @@ class PageControllerTest extends WebTestCase
         $this->assertEquals($updatedPage, $page);
     }
 
+    public function testJsonPatchPageAction()
+    {
+        $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
+        $this->customSetUp($fixtures);
+        $pages = LoadPageData::$pages;
+        $page = array_pop($pages);
+
+        $this->client = static::createClient();
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/v1/pages/%d.json', $page->getId()),
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            '{"body":"def"}'
+        );
+
+        $page->setBody('def');
+
+        $this->assertJsonResponse($this->client->getResponse(), 204, false);
+
+        $updatedPage = $this->getContainer()->get('acme_blog.page.handler')->get($page->getId());
+        $this->assertEquals($updatedPage, $page);
+    }
+
+
     public function testJsonPostPageAction()
     {
         $this->client = static::createClient();
