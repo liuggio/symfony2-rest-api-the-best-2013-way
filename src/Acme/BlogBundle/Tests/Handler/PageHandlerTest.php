@@ -55,6 +55,23 @@ class PageHandlerTest extends \PHPUnit_Framework_TestCase
         $this->pageHandler->get($id);
     }
 
+    public function testAll()
+    {
+        $offset = 1;
+        $limit = 2;
+
+        $pages = $this->getPages(2);
+        $this->repository->expects($this->once())->method('findBy')
+            ->with(array(), null, $limit, $offset)
+            ->will($this->returnValue($pages));
+
+        $this->pageHandler = $this->createPageHandler($this->om, static::PAGE_CLASS,  $this->formFactory);
+
+        $all = $this->pageHandler->all($limit, $offset);
+
+        $this->assertEquals($pages, $all);
+    }
+
     public function testPost()
     {
         $title = 'title1';
@@ -192,6 +209,16 @@ class PageHandlerTest extends \PHPUnit_Framework_TestCase
         $pageClass = static::PAGE_CLASS;
 
         return new $pageClass();
+    }
+
+    protected function getPages($maxPages = 5)
+    {
+        $pages = array();
+        for($i = 0; $i < $maxPages; $i++) {
+            $pages[] = $this->getPage();
+        }
+
+        return $pages;
     }
 }
 

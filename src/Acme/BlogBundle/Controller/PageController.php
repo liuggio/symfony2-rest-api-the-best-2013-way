@@ -34,7 +34,9 @@ class PageController extends FOSRestController
      * @Annotations\QueryParam(name="offset", requirements="\d+", nullable=true, description="Offset from which to start listing pages.")
      * @Annotations\QueryParam(name="limit", requirements="\d+", default="5", description="How many pages to return.")
      *
-     * @Annotations\View()
+     * @Annotations\View(
+     *  templateVar="pages"
+     * )
      *
      * @param Request               $request      the request object
      * @param ParamFetcherInterface $paramFetcher param fetcher service
@@ -43,16 +45,11 @@ class PageController extends FOSRestController
      */
     public function getPagesAction(Request $request, ParamFetcherInterface $paramFetcher)
     {
-        $session = $request->getSession();
-
         $offset = $paramFetcher->get('offset');
-        $start = null == $offset ? 0 : $offset + 1;
+        $offset = null == $offset ? 0 : $offset;
         $limit = $paramFetcher->get('limit');
 
-        $pages = $session->get(self::SESSION_CONTEXT_PAGE, array());
-        $pages = array_slice($notes, $start, $limit, true);
-
-        return new NoteCollection($notes, $offset, $limit);
+        return $this->container->get('acme_blog.page.handler')->all($limit, $offset);
     }
 
     /**
@@ -123,7 +120,7 @@ class PageController extends FOSRestController
      *  templateVar = "form"
      * )
      *
-     * @param Request $request the request instance
+     * @param Request $request the request object
      *
      * @return FormTypeInterface|View
      */
@@ -165,7 +162,7 @@ class PageController extends FOSRestController
      *  templateVar = "form"
      * )
      *
-     * @param Request $request the request instance
+     * @param Request $request the request object
      * @param int     $id      the page id
      *
      * @return FormTypeInterface|View
@@ -218,7 +215,7 @@ class PageController extends FOSRestController
      *  templateVar = "form"
      * )
      *
-     * @param Request $request the request instance
+     * @param Request $request the request object
      * @param int     $id      the page id
      *
      * @return FormTypeInterface|View

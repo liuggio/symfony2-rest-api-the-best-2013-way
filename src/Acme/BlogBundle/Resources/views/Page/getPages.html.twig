@@ -1,0 +1,18 @@
+{% block content %}
+    <h1 class="title">{{ 'page.list'|trans({}, 'AcmeBlogBundle') }}</h1>
+
+    <ul id="page-list">
+        {% for page in pages %}
+            <li>
+                <a href="{{ path('api_1_get_page', {'id': page.id}) }}">{{ page.title }}</a>
+                {#[<a href="{{ path('api_1_edit_pages', {'id': page.id}) }}">{{ 'page.edit.link'|trans({}, 'AcmeBlogBundle') }}</a>]#}
+                {#[<a href="{{ path('api_1_remove_pages', {'id': page.id}) }}">{{ 'page.remove.link'|trans({}, 'AcmeBlogBundle') }}</a>]#}
+            </li>
+        {% else %}
+            <li>{{ 'page.list.empty'|trans({}, 'AcmeBlogBundle') }}</li>
+        {% endfor %}
+    </ul>
+    <p>
+        <a href="{{ path('api_1_new_page') }}">{{ 'page.new.link'|trans({}, 'AcmeBlogBundle') }}</a>
+    </p>
+{% endblock %}

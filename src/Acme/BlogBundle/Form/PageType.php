@@ -27,7 +27,6 @@ class PageType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'Acme\BlogBundle\Entity\Page',
-            'csrf_protection'   => false
         ));
     }
 

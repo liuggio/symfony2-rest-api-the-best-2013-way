@@ -9,7 +9,7 @@ use Acme\BlogBundle\Model\PageInterface;
  * Page
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity()
  */
 class Page implements PageInterface
 {

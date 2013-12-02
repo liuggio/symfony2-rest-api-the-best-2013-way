@@ -7,16 +7,20 @@ use Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData;
 
 class PageControllerTest extends WebTestCase
 {
-    public function customSetUp($fixtures)
+    public function setUp()
     {
-        $this->client = static::createClient();
-        $this->loadFixtures($fixtures);
+        $this->auth = array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        );
+
+        $this->client = static::createClient(array(), $this->auth);
     }
 
     public function testJsonGetPageAction()
     {
         $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
-        $this->customSetUp($fixtures);
+        $this->loadFixtures($fixtures);
         $pages = LoadPageData::$pages;
         $page = array_pop($pages);
 
@@ -34,7 +38,7 @@ class PageControllerTest extends WebTestCase
     public function testHeadRoute()
     {
         $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
-        $this->customSetUp($fixtures);
+        $this->loadFixtures($fixtures);
         $pages = LoadPageData::$pages;
         $page = array_pop($pages);
 
@@ -45,7 +49,6 @@ class PageControllerTest extends WebTestCase
 
     public function testJsonNewPageAction()
     {
-        $this->client = static::createClient();
         $this->client->request(
             'GET',
             '/api/v1/pages/new.json',
@@ -62,7 +65,6 @@ class PageControllerTest extends WebTestCase
 
     public function testJsonPostPageAction()
     {
-        $this->client = static::createClient();
         $this->client->request(
             'POST',
             '/api/v1/pages.json',
@@ -77,7 +79,6 @@ class PageControllerTest extends WebTestCase
 
     public function testJsonPostPageActionShouldReturn400WithBadParameters()
     {
-        $this->client = static::createClient();
         $this->client->request(
             'POST',
             '/api/v1/pages.json',
@@ -93,11 +94,13 @@ class PageControllerTest extends WebTestCase
     public function testJsonPutPageActionShouldModify()
     {
         $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
-        $this->customSetUp($fixtures);
+        $this->loadFixtures($fixtures);
         $pages = LoadPageData::$pages;
         $page = array_pop($pages);
 
-        $this->client = static::createClient();
+        $this->client->request('GET', sprintf('/api/v1/pages/%d.json', $page->getId()), array('ACCEPT' => 'application/json'));
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+
         $this->client->request(
             'PUT',
             sprintf('/api/v1/pages/%d.json', $page->getId()),
@@ -119,9 +122,7 @@ class PageControllerTest extends WebTestCase
 
     public function testJsonPutPageActionShouldCreate()
     {
-        $this->client = static::createClient();
         $id = 0;
-
         $this->client->request('GET', sprintf('/api/v1/pages/%d.json', $id), array('ACCEPT' => 'application/json'));
 
         $this->assertEquals(404, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
@@ -141,11 +142,10 @@ class PageControllerTest extends WebTestCase
     public function testJsonPatchPageAction()
     {
         $fixtures = array('Acme\BlogBundle\Tests\Fixtures\Entity\LoadPageData');
-        $this->customSetUp($fixtures);
+        $this->loadFixtures($fixtures);
         $pages = LoadPageData::$pages;
         $page = array_pop($pages);
 
-        $this->client = static::createClient();
         $this->client->request(
             'PATCH',
             sprintf('/api/v1/pages/%d.json', $page->getId()),
@@ -164,10 +164,6 @@ class PageControllerTest extends WebTestCase
             $this->client->getResponse()->headers
         );
     }
-
-
-
-
 
     protected function assertJsonResponse($response, $statusCode = 200, $checkValidJson =  true, $contentType = 'application/json')
     {

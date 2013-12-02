@@ -17,6 +17,15 @@ interface PageHandlerInterface
      */
     public function get($id);
 
+    /**
+     * Get a list of Pages.
+     *
+     * @param int $limit  the limit of the result
+     * @param int $offset starting from the offset
+     *
+     * @return array
+     */
+    public function all($limit = 5, $offset = 0);
 
     /**
      * Post Page, creates a new Page.

@@ -36,15 +36,16 @@ class PageHandler implements PageHandlerInterface
     }
 
     /**
-     * Get a Page.
+     * Get a list of Pages.
      *
-     * @param mixed $id
+     * @param int $limit  the limit of the result
+     * @param int $offset starting from the offset
      *
-     * @return PageInterface
+     * @return array
      */
-    public function all(int $offset = 0, int $limit = 5)
+    public function all($limit = 5, $offset = 0)
     {
-        return $this->repository->find($id);
+        return $this->repository->findBy(array(), null, $limit, $offset);
     }
 
     /**
@@ -64,8 +65,8 @@ class PageHandler implements PageHandlerInterface
     /**
      * Edit a Page.
      *
-     * @param PageInterface   $page
-     * @param array           $parameters
+     * @param PageInterface $page
+     * @param array         $parameters
      *
      * @return PageInterface
      */
@@ -77,8 +78,8 @@ class PageHandler implements PageHandlerInterface
     /**
      * Partially update a Page.
      *
-     * @param PageInterface   $page
-     * @param array           $parameters
+     * @param PageInterface $page
+     * @param array         $parameters
      *
      * @return PageInterface
      */
@@ -116,7 +117,7 @@ class PageHandler implements PageHandlerInterface
 
     private function createPage()
     {
-         return new $this->entityClass();
+        return new $this->entityClass();
     }
 
 }
