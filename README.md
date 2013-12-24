@@ -1,7 +1,7 @@
 REST API Symfony2: the best 2013 way
 ====================================
 
-This is the code to support the article at [Symfony2 API REST the best way](http://welcometothebundle.com/rest-api-symfony2-the-best-2013-way/)
+This is the code to support the article at [Symfony2 API REST the best way](http://welcometothebundle.com/symfony2-rest-api-the-best-2013-way/)
 
 ### Install with Composer
 
