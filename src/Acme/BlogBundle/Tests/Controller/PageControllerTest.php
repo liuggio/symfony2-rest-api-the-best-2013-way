@@ -42,7 +42,11 @@ class PageControllerTest extends WebTestCase
         $pages = LoadPageData::$pages;
         $page = array_pop($pages);
 
-        $this->client->request('HEAD',  sprintf('/api/v1/pages/%d.json', $page->getId()), array('ACCEPT' => 'application/json'));
+        $this->client->request(
+            'HEAD',  
+            sprintf('/api/v1/pages/%d.json', $page->getId()), 
+            array('ACCEPT' => 'application/json')
+        );
         $response = $this->client->getResponse();
         $this->assertJsonResponse($response, 200, false);
     }
@@ -60,7 +64,8 @@ class PageControllerTest extends WebTestCase
         $this->assertEquals(
             '{"children":{"title":[],"body":[]}}',
             $this->client->getResponse()->getContent(),
-            $this->client->getResponse()->getContent());
+            $this->client->getResponse()->getContent()
+        );
     }
 
     public function testJsonPostPageAction()
@@ -98,8 +103,16 @@ class PageControllerTest extends WebTestCase
         $pages = LoadPageData::$pages;
         $page = array_pop($pages);
 
-        $this->client->request('GET', sprintf('/api/v1/pages/%d.json', $page->getId()), array('ACCEPT' => 'application/json'));
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->client->request(
+            'GET', 
+            sprintf('/api/v1/pages/%d.json', 
+            $page->getId()), array('ACCEPT' => 'application/json')
+        );
+        $this->assertEquals(
+            200, 
+            $this->client->getResponse()->getStatusCode(), 
+            $this->client->getResponse()->getContent()
+        );
 
         $this->client->request(
             'PUT',
@@ -125,7 +138,11 @@ class PageControllerTest extends WebTestCase
         $id = 0;
         $this->client->request('GET', sprintf('/api/v1/pages/%d.json', $id), array('ACCEPT' => 'application/json'));
 
-        $this->assertEquals(404, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertEquals(
+            404, 
+            $this->client->getResponse()->getStatusCode(), 
+            $this->client->getResponse()->getContent()
+        );
 
         $this->client->request(
             'PUT',
@@ -165,7 +182,12 @@ class PageControllerTest extends WebTestCase
         );
     }
 
-    protected function assertJsonResponse($response, $statusCode = 200, $checkValidJson =  true, $contentType = 'application/json')
+    protected function assertJsonResponse(
+        $response, 
+        $statusCode = 200, 
+        $checkValidJson =  true, 
+        $contentType = 'application/json'
+    )
     {
         $this->assertEquals(
             $statusCode, $response->getStatusCode(),
